@@ -1,5 +1,5 @@
 import  { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast} from 'react-toastify';
 import useAuth from '../../Hooks/useAuth';
 
@@ -9,6 +9,7 @@ const Login = () => {
     email: '',
     password: '',
   });
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +26,7 @@ const Login = () => {
       setLoading(false);
       // Show success toast
       toast.success('Login successful!');
+      navigate("/dashboard")
     } catch (error) {
       console.error('Login error:', error.message);
       setLoading(false);

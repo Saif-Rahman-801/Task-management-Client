@@ -6,9 +6,11 @@ import Home from "./Components/Home/Home";
 import Layout from "./Components/HomeLayout/Layout";
 import AuthProviders from "./Context/AuthProviders";
 import Register from "./Components/Register/Register";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Login from "./Components/Login/Login";
+import PrivateRoute from "./Components/PrivateRoutes/PrivateDashboard";
+import Dashboard from "./Components/Dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -21,12 +23,20 @@ const router = createBrowserRouter([
       },
       {
         path: "/register",
-        element: <Register />
+        element: <Register />,
       },
       {
         path: "/login",
-        element: <Login />
-      }
+        element: <Login />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
 ]);
