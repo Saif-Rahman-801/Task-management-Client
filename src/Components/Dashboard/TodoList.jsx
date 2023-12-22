@@ -5,6 +5,7 @@ import useAxiosPublic from "../../Hooks/useAxiosPublic";
 const TodoList = () => {
   const axiosPublic = useAxiosPublic();
   const [allTodo, setAllTodo] = useState([]);
+  const [done, setDone] = useState([]);
   const [pendingTodo, setPendingTodo] = useState([]);
 
   const fetchTodos = () => {
@@ -31,12 +32,28 @@ const TodoList = () => {
       });
   };
 
+  const fetchDone = () => {
+    axiosPublic
+      .get("/done")
+      .then((res) => {
+        setDone(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to fetch completed todos");
+      });
+  };
+
   useEffect(() => {
     fetchTodos();
   }, [axiosPublic]);
 
   useEffect(() => {
     fetchPendings();
+  }, [axiosPublic]);
+
+  useEffect(() => {
+    fetchDone();
   }, [axiosPublic]);
 
   const handleSubmit = (e) => {
@@ -80,6 +97,45 @@ const TodoList = () => {
       .catch((err) => {
         console.error(err);
         toast.error("Failed to mark todo as pending");
+      });
+  };
+
+  const handleDone = (id) => {
+    const filterDone = pendingTodo.find((todo) => todo._id === id);
+    const done = {
+      todo: filterDone.todo,
+    };
+
+    axiosPublic
+      .post("/done", done)
+      .then((res) => {
+        if (res.data.insertedId) {
+          toast.success("Todo marked as done");
+          // Refetch completed todos after a successful todo creation
+          fetchDone();
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to mark todo as done");
+      });
+  };
+
+  const handleDeleteDone = (id) => {
+    axiosPublic
+      .delete(`/done/${id}`)
+      .then((res) => {
+        if (res.data.deletedCount > 0) {
+          toast.success("Todo deleted successfully");
+          // Refetch completed todos after a successful deletion
+          fetchDone();
+        } else {
+          toast.error("Failed to delete todo");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to delete todo");
       });
   };
 
@@ -135,11 +191,28 @@ const TodoList = () => {
           {pendingTodo.map((pending) => (
             <div key={pending._id} className="bg-yellow-200 p-2 mb-2 rounded">
               <p>{pending.todo}</p>
+              <button
+                onClick={() => handleDone(pending._id)}
+                className="border p-1 rounded-md bg-green-500 text-white"
+              >
+                Mark Done
+              </button>
             </div>
           ))}
         </div>
         <div>
           <h2 className="font-bold">Done</h2>
+          {done.map((doneItem) => (
+            <div key={doneItem._id} className="bg-green-200 p-2 mb-2 rounded">
+              <p>{doneItem.todo}</p>
+              <button
+                onClick={() => handleDeleteDone(doneItem._id)}
+                className="border p-1 rounded-md bg-red-500 text-white"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </div>
